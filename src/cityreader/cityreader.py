@@ -1,11 +1,23 @@
+import csv
+
 # Create a class to hold a city location. Call the class "City". It should have
 # fields for name, lat and lon (representing latitude and longitude).
+
+
+class City:
+    def __init__(self, name, lat, lon):
+        self.name = name
+        self.lat = lat
+        self.lon = lon
+
+    def __repr__(self):
+        return f"{self.name}: ({self.lat},{self.lon})"
 
 
 # We have a collection of US cities with population over 750,000 stored in the
 # file "cities.csv". (CSV stands for "comma-separated values".)
 #
-# In the body of the `cityreader` function, use Python's built-in "csv" module 
+# In the body of the `cityreader` function, use Python's built-in "csv" module
 # to read this file so that each record is imported into a City instance. Then
 # return the list with all the City instances from the function.
 # Google "python 3 csv" for references and use your Google-fu for other examples.
@@ -16,27 +28,44 @@
 # should not be loaded into a City object.
 cities = []
 
+
 def cityreader(cities=[]):
-  # TODO Implement the functionality to read from the 'cities.csv' file
-  # Ensure that the lat and lon valuse are all floats
-  # For each city record, create a new City instance and add it to the 
-  # `cities` list
-    
-    return cities
+    # TODO Implement the functionality to read from the 'cities.csv' file
+    # Ensure that the lat and lon valuse are all floats
+    # For each city record, create a new City instance and add it to the
+    # `cities` list
+    with open('cities.csv', 'r') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        line_count = 0
+        for row in csv_reader:
+            if line_count == 0:
+                # print(f'Column names are {", ".join(row)}')
+                line_count += 1
+            else:
+                city = City(row[0], float(row[3]), float(row[4]))
+                cities.append(city)
+                # print(
+                #     f'\t{row[0]}, {row[1]}, {row[2]}, {row[3]}, {float(row[4])}, {float(row[5])}, {row[6]}, {row[7]}, {row[8]}')
+
+                line_count += 1
+        print(f'Processed {line_count} lines.')
+
+        return cities
+
 
 cityreader(cities)
 
 # Print the list of cities (name, lat, lon), 1 record per line.
 for c in cities:
-    print(c)
+    print(f"{c.name}, lat: {c.lat}, lon: {c.lon}")
 
 # STRETCH GOAL!
 #
 # Allow the user to input two points, each specified by latitude and longitude.
-# These points form the corners of a lat/lon square. Pass these latitude and 
+# These points form the corners of a lat/lon square. Pass these latitude and
 # longitude values as parameters to the `cityreader_stretch` function, along
 # with the `cities` list that holds all the City instances from the `cityreader`
-# function. This function should output all the cities that fall within the 
+# function. This function should output all the cities that fall within the
 # coordinate square.
 #
 # Be aware that the user could specify either a lower-left/upper-right pair of
@@ -61,11 +90,37 @@ for c in cities:
 
 # TODO Get latitude and longitude values from the user
 
-def cityreader_stretch(lat1, lon1, lat2, lon2, cities=[]):
-  # within will hold the cities that fall within the specified region
-  within = []
-  
-  # Go through each city and check to see if it falls within 
-  # the specified coordinates.
+lat1 = input("enter latitude1: ")
+lon1 = input("enter longitude1: ")
+lat2 = input("enter latitude2: ")
+lon2 = input("enter longitude2: ")
 
-  return within
+tla = float(lat1) if float(lat1) > float(lat2) else float(lat2)  # top left lat
+bra = float(lat1) if float(lat1) < float(
+    lat2) else float(lat2)  # bot right lat
+tlo = float(lon1) if float(lat1) < float(lon2) else float(lon2)  # top left lon
+bro = float(lon1) if float(lat1) > float(
+    lon2) else float(lon2)  # bot right lon
+
+print('lat small', bra)
+print('lat large', tla)
+print('lon small', tlo)
+print('lon large', bro)
+print(type(tla))
+print("this is tla", tla)
+
+
+def cityreader_stretch(tla, tlo, bra, bro, cities):
+    # within will hold the cities that fall within the specified region
+    within = []
+
+    # Go through each city and check to see if it falls within
+    # the specified coordinates.
+    for city in cities:
+        if city.lat <= tla and city.lat >= bra and city.lon >= tlo and city.lon <= bro:
+            within.append(city)
+
+    return within
+
+
+print(cityreader_stretch(tla, tlo, bra, bro, cities))
